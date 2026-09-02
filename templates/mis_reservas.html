@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Mis reservas — Millas & Viñas{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Mis reservas</h2>
+      <a href="{{ url_for('explorar') }}" class="tag">reservar algo más →</a>
+    </div>
+
+    {% if reservas %}
+    <div class="table-card">
+      <table class="simple">
+        <thead>
+          <tr><th>Fecha</th><th>Detalle</th><th>Millas generadas</th></tr>
+        </thead>
+        <tbody>
+          {% for r in reservas %}
+          <tr>
+            <td>{{ r.fecha_reserva }}</td>
+            <td>
+              {% if r.pasaje %}Pasaje: {{ r.pasaje.descripcion }}
+              {% elif r.hotel %}Hotel: {{ r.hotel.nombre }}
+              {% elif r.circuito %}Circuito: {{ r.circuito.denominacion }}
+              {% endif %}
+            </td>
+            <td>{{ r.millas_generadas }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p>Todavía no hiciste ninguna reserva. <a href="{{ url_for('explorar') }}">Explorá el catálogo</a> para empezar a sumar millas.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

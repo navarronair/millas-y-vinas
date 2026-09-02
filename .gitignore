@@ -1,0 +1,21 @@
+# Secretos: NUNCA subir esto a GitHub
+.env
+
+# Entorno virtual
+venv/
+venv2/
+venv_preview/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
+*.code-workspace
+
+# Sistema
+.DS_Store
+Thumbs.db

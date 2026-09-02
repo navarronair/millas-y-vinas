@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Explorar — Millas & Viñas{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Explorar</h2>
+      <span class="tag">pasajes · hoteles · circuitos</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('pasajes')">Pasajes</button>
+      <button class="tab-btn" onclick="showTab('hoteles')">Hoteles</button>
+      <button class="tab-btn" onclick="showTab('circuitos')">Circuitos</button>
+    </div>
+
+    <!-- PASAJES -->
+    <div id="tab-pasajes" class="tab-panel active">
+      <div class="card-grid">
+        {% for p in pasajes %}
+        <div class="pass-card">
+          <div class="pass-card-body">
+            <div class="pass-card-route">{{ p.salida.codigo }} → {{ p.llegada.codigo }}</div>
+            <div class="pass-card-meta">
+              {{ p.descripcion }}<br>
+              {{ p.horario_vuelo[:16].replace('T', ' ') }}
+            </div>
+            <div class="pass-card-footer">
+              <span class="price">${{ "{:,.0f}".format(p.precio).replace(",", ".") }}</span>
+              <span class="miles-tag">+{{ p.millas_otorgadas }} millas</span>
+            </div>
+            <form method="POST" action="{{ url_for('reservar', tipo='pasaje', item_id=p.pasaje_id) }}" style="margin-top:16px;">
+              <button type="submit" class="btn btn-primary btn-block btn-sm">Reservar pasaje</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- HOTELES -->
+    <div id="tab-hoteles" class="tab-panel">
+      <div class="card-grid">
+        {% for h in hoteles %}
+        <div class="pass-card">
+          <img class="pass-card-img" src="https://picsum.photos/seed/hotel{{ h.hotel_id }}/400/220" alt="{{ h.nombre }}">
+          <div class="pass-card-body">
+            <div class="pass-card-route">{{ h.nombre }}</div>
+            <div class="pass-card-meta">{{ h.ciudad.nombre }} &middot; {{ h.categoria }}★</div>
+            <div class="pass-card-footer">
+              <span class="price">${{ "{:,.0f}".format(h.precio_noche).replace(",", ".") }} <small>/noche</small></span>
+            </div>
+            <form method="POST" action="{{ url_for('reservar', tipo='hotel', item_id=h.hotel_id) }}" style="margin-top:16px;">
+              <button type="submit" class="btn btn-primary btn-block btn-sm">Reservar hotel</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- CIRCUITOS -->
+    <div id="tab-circuitos" class="tab-panel">
+      <div class="card-grid">
+        {% for c in circuitos %}
+        <div class="pass-card">
+          <img class="pass-card-img" src="https://picsum.photos/seed/circuito{{ c.circuito_id }}/400/220" alt="{{ c.denominacion }}">
+          <div class="pass-card-body">
+            <div class="pass-card-route">{{ c.denominacion }}</div>
+            <div class="pass-card-meta">Circuito turístico guiado</div>
+            <div class="pass-card-footer">
+              <span class="price">${{ "{:,.0f}".format(c.precio).replace(",", ".") }}</span>
+            </div>
+            <form method="POST" action="{{ url_for('reservar', tipo='circuito', item_id=c.circuito_id) }}" style="margin-top:16px;">
+              <button type="submit" class="btn btn-primary btn-block btn-sm">Reservar circuito</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+# Render Blueprint — despliegue de Millas & Viñas
+# https://render.com/docs/blueprint-spec
+#
+# Render detecta este archivo automáticamente al crear un "Blueprint"
+# y prepara el servicio con estos valores. Las dos variables marcadas
+# con "sync: false" NO se guardan en este archivo (por eso es seguro
+# subir este repo a GitHub): Render te las va a pedir una sola vez,
+# en el Dashboard, al crear el servicio.
+
+services:
+  - type: web
+    name: millas-y-vinas
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true

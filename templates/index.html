@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Millas & Viñas — Viajá, sumá millas, disfrutá vinoteca{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">Turismo &amp; Beneficios</div>
+      <h1>Cada viaje suma. Cada categoría abre una puerta.</h1>
+      <p class="hero-lede">
+        Reservá pasajes, hoteles y circuitos. Tus pasajes acumulan millas
+        automáticamente, y esas millas te suben de categoría: más descuento
+        y acceso a vinos de catálogo exclusivo en nuestra Vinoteca.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('explorar') }}" class="btn btn-primary">Explorar viajes</a>
+        <a href="{{ url_for('registro') }}" class="btn btn-outline">Crear cuenta</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="330" cy="130" r="150" fill="var(--brass)" fill-opacity="0.08"/>
+        <circle cx="120" cy="330" r="90" fill="var(--wine)" fill-opacity="0.06"/>
+
+        <!-- filas de viñedo -->
+        <g stroke="var(--brass-light)" stroke-width="2" fill="none" opacity="0.9">
+          <path d="M20,390 Q240,360 460,390"/>
+          <path d="M10,405 Q240,378 470,405"/>
+        </g>
+
+        <!-- ruta punteada -->
+        <path d="M75,345 Q235,55 385,75" fill="none" stroke="var(--brass)" stroke-width="3" stroke-dasharray="2 11" stroke-linecap="round"/>
+        <circle cx="75" cy="345" r="7" fill="var(--teal)"/>
+        <circle cx="235" cy="150" r="5" fill="var(--brass)"/>
+        <circle cx="385" cy="75" r="9" fill="var(--wine)"/>
+
+        <!-- avioncito -->
+        <g transform="translate(385,75) rotate(-35)">
+          <path d="M0,-13 L9,7 L1,3 L-9,7 Z" fill="var(--wine)"/>
+        </g>
+
+        <!-- copa de vino -->
+        <g transform="translate(140,300)" stroke="var(--wine)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M-16,-38 C-16,-14 16,-14 16,-38 C16,-46 -16,-46 -16,-38 Z"/>
+          <path d="M-16,-38 C-16,-20 -4,-6 0,-6 C4,-6 16,-20 16,-38"/>
+          <line x1="0" y1="-6" x2="0" y2="26"/>
+          <line x1="-14" y1="26" x2="14" y2="26"/>
+        </g>
+
+        <!-- racimo de uvas -->
+        <g fill="var(--brass)">
+          <circle cx="70" cy="270" r="7"/>
+          <circle cx="83" cy="278" r="7"/>
+          <circle cx="70" cy="288" r="7"/>
+          <circle cx="83" cy="296" r="7"/>
+          <circle cx="76" cy="306" r="7"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Categorías del programa</h2>
+      <span class="tag">bronze · silver · gold · platinum</span>
+    </div>
+    <div class="tiers">
+      {% for c in categorias %}
+      <div class="tier-card tier-{{ c.nivel }}">
+        <div class="tier-seal">{{ c.nombre[0] }}</div>
+        <div class="tier-name">{{ c.nombre }}</div>
+        <p class="tier-detail">Desde {{ "{:,}".format(c.millas_minimas).replace(",", ".") }} millas</p>
+        <p class="tier-detail">{{ c.descuento_pct|int }}% off en vinoteca</p>
+        {% if c.acceso_exclusivo == 'S' %}
+          <p class="tier-detail">Catálogo exclusivo</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Circuitos destacados</h2>
+      <a href="{{ url_for('explorar') }}" class="tag">ver todo el catálogo →</a>
+    </div>
+    <div class="card-grid">
+      {% for c in circuitos %}
+      <div class="pass-card">
+        <img class="pass-card-img" src="https://picsum.photos/seed/circuito{{ c.circuito_id }}/400/220" alt="{{ c.denominacion }}">
+        <div class="pass-card-body">
+          <div class="pass-card-route">{{ c.denominacion }}</div>
+          <div class="pass-card-meta">Circuito turístico guiado</div>
+          <div class="pass-card-footer">
+            <span class="price">${{ "{:,.0f}".format(c.precio).replace(",", ".") }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="passport">
+      <div class="passport-seal">🍷</div>
+      <div>
+        <h3>La Vinoteca vive dentro de Beneficios</h3>
+        <p>
+          No es una tienda aparte: es el premio por viajar con nosotros. Cuanto más
+          alto tu nivel, mayor el descuento y más botellas del catálogo exclusivo
+          se destraban para vos.
+        </p>
+        <a href="{{ url_for('registro') }}" class="btn btn-teal">Empezar a sumar millas</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

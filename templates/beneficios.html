@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Beneficios — Millas & Viñas{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    {% set tier_color = {1: 'var(--bronze)', 2: 'var(--silver)', 3: 'var(--gold)', 4: 'var(--platinum)'} %}
+
+    <div class="passport">
+      <div class="passport-seal">{{ cliente.categoria_cliente.nombre[0] }}</div>
+      <div style="flex:1;">
+        <div class="hero-eyebrow" style="margin-bottom:2px;">Tu categoría</div>
+        <h2 style="margin-bottom:4px;">{{ cliente.categoria_cliente.nombre }}</h2>
+        <p style="margin-bottom:10px;">
+          {{ cliente.nombre }} {{ cliente.apellido }} &middot;
+          {{ "{:,}".format(cliente.millas_acumuladas).replace(",", ".") }} millas acumuladas &middot;
+          {{ cliente.categoria_cliente.descuento_pct|int }}% de descuento en vinoteca
+        </p>
+
+        {% if siguiente %}
+          <div class="progress-track">
+            <div class="progress-fill" style="width:{{ progreso_pct }}%;"></div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--ink-soft);margin:0;">
+            Te faltan {{ "{:,}".format(millas_faltantes).replace(",", ".") }} millas para llegar a {{ siguiente.nombre }}
+          </p>
+        {% else %}
+          <p style="font-size:0.85rem;color:var(--ink-soft);margin:0;">
+            Alcanzaste la categoría máxima del programa.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h3>Vinoteca — beneficios de tu categoría</h3>
+      <span class="tag">{{ vinos|length }} vinos</span>
+    </div>
+
+    <div class="card-grid">
+      {% for v in vinos %}
+        {% set nivel_requerido = v.categoria_cliente.nivel if v.categoria_cliente else 0 %}
+        {% set bloqueado = nivel_requerido > cliente.categoria_cliente.nivel %}
+        {% set precio_final = v.precio * (1 - cliente.categoria_cliente.descuento_pct / 100) %}
+        <div id="vino-{{ v.vino_id }}" class="wine-card {{ 'locked' if bloqueado else '' }}">
+          {% if v.categoria_cliente %}
+            <div class="wine-lock-badge" style="background:{{ tier_color[v.categoria_cliente.nivel] }};">{{ v.categoria_cliente.nombre }}+</div>
+          {% endif %}
+          <div class="wine-varietal">{{ v.varietal }} &middot; {{ v.anio }}</div>
+          <div class="wine-name">{{ v.nombre }}</div>
+          <p class="wine-bodega">{{ v.bodega.nombre }}</p>
+
+          <div class="wine-price-row">
+            {% if cliente.categoria_cliente.descuento_pct > 0 %}
+              <span class="wine-price-old">${{ "{:,.0f}".format(v.precio).replace(",", ".") }}</span>
+            {% endif %}
+            <span class="price">${{ "{:,.0f}".format(precio_final).replace(",", ".") }}</span>
+          </div>
+
+          {% if bloqueado %}
+            <button class="btn btn-outline btn-block btn-sm" disabled>
+              Requiere categoría {{ v.categoria_cliente.nombre }}
+            </button>
+          {% else %}
+            <form method="POST" action="{{ url_for('comprar_vino', vino_id=v.vino_id) }}" class="qty-form">
+              <input type="number" name="cantidad" value="1" min="1" max="12">
+              <button type="submit" class="btn btn-primary btn-sm" style="flex:1;">Comprar</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if compras %}
+    <div class="section-head" style="margin-top:52px;">
+      <h3>Tus últimas compras</h3>
+    </div>
+    <div class="table-card">
+      <table class="simple">
+        <thead>
+          <tr><th>Fecha</th><th>Vino</th><th>Cantidad</th><th>Descuento</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          {% for c in compras %}
+            {% for linea in c.linea_venta_vino %}
+            <tr>
+              <td>{{ c.fecha }}</td>
+              <td>{{ linea.vino.nombre }}</td>
+              <td>{{ linea.cantidad }}</td>
+              <td>{{ c.descuento_aplicado|int }}%</td>
+              <td>${{ "{:,.0f}".format(c.total).replace(",", ".") }}</td>
+            </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

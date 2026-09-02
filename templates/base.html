@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Millas & Viñas — Turismo con beneficios{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="{{ url_for('home') }}" class="brand">Millas <span class="amp">&amp;</span> Viñas</a>
+      <div class="nav-links">
+        <a href="{{ url_for('home') }}">Inicio</a>
+        <a href="{{ url_for('explorar') }}">Explorar</a>
+        {% if session.get('cliente_dni') %}
+          <a href="{{ url_for('beneficios') }}">Beneficios</a>
+          <a href="{{ url_for('concierge') }}">Concierge</a>
+          <a href="{{ url_for('mis_reservas') }}">Mis reservas</a>
+          <a href="{{ url_for('logout') }}">Salir ({{ session.get('cliente_nombre') }})</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Ingresar</a>
+          <a href="{{ url_for('registro') }}" class="nav-cta">Crear cuenta</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrap">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <div class="container">
+      Millas &amp; Viñas &middot; Agencia con base en Firmat, Santa Fe &middot;
+      Proyecto académico &mdash; Cátedra Gestión de Proyectos
+    </div>
+  </footer>
+
+</body>
+</html>
