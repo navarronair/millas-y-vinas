@@ -170,32 +170,41 @@ que suele salir cuando se porta un modelo de una base a la otra.
   (la tabla `PARTICIPANTE` / `RESERVA_PARTICIPANTE` ya está en el modelo).
 - Página de detalle de cada vino/circuito/hotel.
 - Barra de progreso animada y notificación cuando subís de categoría.
-- Conectar los "beneficios de viaje" del Concierge (upgrades, sala VIP,
+- Conectar los "beneficios de viaje" de Grapie (upgrades, sala VIP,
   regalos) a una tabla real con canje efectivo de millas, igual que ya
   existe para el catálogo exclusivo de vinos.
 
-## Sobre el Concierge (/concierge)
+## Sobre Grapie (la burbuja de chat)
 
 Es la colaboración de un compañero: un chatbot simple (sin IA, coincidencia
 de palabras clave) que sugiere vinos y beneficios de viaje según la
-categoría del cliente. La versión original venía standalone, con 4
-clientes de prueba hardcodeados y su propio catálogo de vinos aparte.
+categoría del cliente. Pasó por dos versiones — la primera era una página
+aparte (`/concierge`, ya no existe); esta es una **burbuja flotante** que
+aparece en cualquier página del sitio (se inyecta en `templates/base.html`,
+visible solo si hay una sesión iniciada), con un flujo de conversación más
+prolijo: indicador de "escribiendo...", confirmación Sí/No al final de
+cada consulta, y cierre de conversación.
 
-Para integrarlo:
-- Ahora usa al **cliente realmente logueado** (vía sesión de Flask) en vez
-  de una lista de clientes de prueba — por eso se sacó el selector de
-  clientes que traía la versión original.
-- El catálogo de vinos que recomienda es el **mismo de la vinoteca real**
-  (`/beneficios`), no uno aparte — mismos precios, mismo descuento por
-  categoría, mismos vinos exclusivos.
+La versión original traía 4 clientes de prueba hardcodeados (con un
+selector de chips) y su propio catálogo de vinos aparte. Para integrarla:
+
+- Al abrir la burbuja, su JS (`static/js/grapie.js`) pide una sola vez
+  `GET /api/grapie/perfil` — un endpoint nuevo en `app.py` que devuelve el
+  **cliente realmente logueado** (vía sesión de Flask) y el **catálogo
+  real de vinoteca**, no los datos de prueba. Por eso se sacó el selector
+  de clientes.
+- El catálogo de vinos que recomienda es el mismo de `/beneficios` —
+  mismos precios, mismo descuento por categoría, mismos vinos exclusivos.
+  Cada tarjeta de vino linkea directo a `/beneficios#vino-ID`.
 - Los "beneficios de viaje" (upgrades, sala VIP, regalos) siguen siendo
-  una lista ilustrativa dentro del JS (`static/js/concierge.js`), porque
-  todavía no hay una tabla en la base para canjearlos de verdad — se
-  filtran por categoría mínima igual que los vinos exclusivos, pero no
-  hay backend real de canje. Si quieren llevarlo más lejos, la idea más
-  natural es una tabla `BENEFICIO` + `CANJE_BENEFICIO` parecida a
-  `VINO`/`VENTA_VINO`.
+  una lista ilustrativa dentro del JS, porque todavía no hay una tabla en
+  la base para canjearlos de verdad — se filtran por categoría mínima
+  igual que los vinos exclusivos, pero no hay backend real de canje.
+- El endpoint `/api/grapie/perfil` arma a mano un diccionario mínimo del
+  cliente (nombre, apellido, millas, categoría) en vez de mandar la fila
+  completa — la fila real trae `password_hash`, que nunca debe llegar al
+  navegador.
 - Se adaptó la paleta de colores propia que traía (parecida pero no
   idéntica a la del resto del sitio) para que use las mismas variables
-  de `static/css/style.css` — así se ve como una sección más del sitio,
-  no como un widget pegado aparte.
+  de `static/css/style.css` — así se ve como parte del sitio en cualquier
+  página donde aparezca, no como un widget de terceros pegado encima.

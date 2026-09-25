@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% if session.get('cliente_dni') %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/grapie.css') }}">
+  {% endif %}
 </head>
 <body>
 
@@ -18,7 +21,6 @@
         <a href="{{ url_for('explorar') }}">Explorar</a>
         {% if session.get('cliente_dni') %}
           <a href="{{ url_for('beneficios') }}">Beneficios</a>
-          <a href="{{ url_for('concierge') }}">Concierge</a>
           <a href="{{ url_for('mis_reservas') }}">Mis reservas</a>
           <a href="{{ url_for('logout') }}">Salir ({{ session.get('cliente_nombre') }})</a>
         {% else %}
@@ -47,6 +49,43 @@
       Proyecto académico &mdash; Cátedra Gestión de Proyectos
     </div>
   </footer>
+
+  {% if session.get('cliente_dni') %}
+    <!-- Grapie: burbuja de recomendaciones (colaboración de un compañero).
+         Aparece en cualquier página porque vive acá en base.html, no en
+         una página aparte. Su JS trae los datos reales via /api/grapie/perfil
+         la primera vez que se abre. -->
+    <button id="grapie-launcher" aria-label="Abrir consultas con Grapie">💬</button>
+
+    <section id="grapie-panel" class="hidden">
+      <header>
+        <div>
+          <h2>Grapie 🍇</h2>
+          <p id="grapie-estado">Consulta activa</p>
+        </div>
+        <button id="grapie-cerrar" aria-label="Finalizar consulta">✕</button>
+      </header>
+
+      <div class="grapie-profile" id="grapie-profile"></div>
+
+      <div class="grapie-chat" id="grapie-chat"></div>
+
+      <div class="grapie-quick" id="grapie-quick">
+        <button data-q="sugerime algo">Sugerime algo</button>
+        <button data-q="vino tinto">Vino tinto</button>
+        <button data-q="upgrade de vuelo">Upgrade de vuelo</button>
+        <button data-q="sala vip">Sala VIP</button>
+        <button data-q="regalo">Regalos</button>
+      </div>
+
+      <div class="grapie-composer">
+        <input id="grapie-input" type="text" placeholder="Escribí tu consulta..." autocomplete="off">
+        <button id="grapie-send">Enviar</button>
+      </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/grapie.js') }}"></script>
+  {% endif %}
 
 </body>
 </html>

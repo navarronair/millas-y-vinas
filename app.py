@@ -13,7 +13,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from supabase import create_client, Client
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -294,21 +294,25 @@ def beneficios():
 
 
 # ------------------------------------------------------------------
-# Concierge (chatbot de recomendaciones — colaboración de un compañero)
+# Grapie (chatbot de recomendaciones — colaboración de un compañero)
+#
+# Es una burbuja flotante que aparece en cualquier página del sitio
+# (se inyecta en base.html, no es una página aparte). Cuando el
+# usuario la abre, su JS le pega a este endpoint una sola vez para
+# traer el perfil real del cliente logueado y el catálogo de vinos.
 # ------------------------------------------------------------------
 
-@app.route("/concierge")
-@requiere_login
-def concierge():
+@app.route("/api/grapie/perfil")
+def api_grapie_perfil():
     dni = cliente_logueado()
+    if not dni:
+        return jsonify({"error": "no autenticado"}), 401
+
     cliente = obtener_cliente(dni)
 
-    # Ojo: nunca pasar el dict de `cliente` tal cual al template con
-    # |tojson. Trae PASSWORD_HASH, y eso terminaría visible en el HTML
-    # público de la página. Armamos un objeto mínimo, solo con lo que
-    # necesita el frontend del concierge.
+    # Nunca pasar el dict de `cliente` tal cual al frontend: trae
+    # PASSWORD_HASH. Armamos un objeto mínimo con lo que necesita Grapie.
     cliente_publico = {
-        "dni": cliente["dni"],
         "nombre": cliente["nombre"],
         "apellido": cliente["apellido"],
         "millas_acumuladas": cliente["millas_acumuladas"],
@@ -323,7 +327,7 @@ def concierge():
         .data
     )
 
-    return render_template("concierge.html", cliente=cliente_publico, vinos=vinos)
+    return jsonify({"cliente": cliente_publico, "vinos": vinos})
 
 
 @app.route("/vinoteca/comprar/<int:vino_id>", methods=["POST"])
