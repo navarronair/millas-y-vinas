@@ -30,6 +30,24 @@ AGENCIA_ID_DEFAULT = 1  # única agencia cargada en el seed
 
 
 # ------------------------------------------------------------------
+# TEMPORAL — diagnóstico del error de DNS en Render.
+# Borrar esta ruta en cuanto se resuelva el problema: no hace falta
+# login para verla, y aunque no expone la key, no es algo para dejar
+# en producción.
+# ------------------------------------------------------------------
+@app.route("/__debug_env")
+def __debug_env():
+    url = os.environ.get("SUPABASE_URL", "")
+    key = os.environ.get("SUPABASE_KEY", "")
+    return {
+        "SUPABASE_URL_repr": repr(url),
+        "SUPABASE_URL_len": len(url),
+        "SUPABASE_KEY_len": len(key),
+        "SUPABASE_KEY_primeros_20": repr(key[:20]),
+    }
+
+
+# ------------------------------------------------------------------
 # Helpers
 # ------------------------------------------------------------------
 
